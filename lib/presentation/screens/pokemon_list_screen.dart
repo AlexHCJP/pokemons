@@ -1,11 +1,24 @@
+import 'package:depend/depend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:laa26/core/di/container.dart';
+import 'package:laa26/core/routing/app_routes.dart';
 import 'package:laa26/data/entity/pokemon_entity.dart';
-import 'package:laa26/domain/controllers/pokemon_list/pokemon_list_cubit.dart';
-import 'package:laa26/presentation/screens/pokemon_detail_screen.dart';
+import 'package:laa26/domain/controllers/pokemon_list/pokemon_list_bloc.dart';
 
 class PokemonListScreen extends StatefulWidget {
+  Widget wrappedRoute() {
+    return BlocProvider(
+      create: (context) {
+        return PokemonListBloc(
+          DependencyProvider.of<RootContainer>(context).pokemonRepository,
+        );
+      },
+      child: this,
+    );
+  }
+
   @override
   State<PokemonListScreen> createState() => _PokemonListScreenState();
 }
@@ -18,21 +31,17 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
   }
 
   void _fetch() {
-    context.read<PokemonListCubit>().get();
+    context.read<PokemonListBloc>().add(PokemonListFetchEvent());
   }
 
   VoidCallback _onTap(int index) => () {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => PokemonDetailScreen(id: index + 1),
-      ),
-    );
+    Navigator.pushNamed(context, AppRoutes.pokemon, arguments: index + 1);
   };
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<PokemonListCubit, PokemonListState>(
+      body: BlocBuilder<PokemonListBloc, PokemonListState>(
         builder: (context, state) {
           return switch (state) {
             PokemonListInitialState() || PokemonListLoadingState() => Center(

@@ -1,23 +1,34 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:laa26/data/entity/pokemon_entity.dart';
 import 'package:laa26/data/repositories/pokemon_repository.dart';
 import 'package:meta/meta.dart';
 
 part 'pokemon_list_state.dart';
+part 'pokemon_list_event.dart';
 
-class PokemonListCubit extends Cubit<PokemonListState> {
-  PokemonListCubit(this._repository) : super(PokemonListInitialState());
+class PokemonListBloc extends Bloc<PokemonListFetchEvent, PokemonListState> {
+  PokemonListBloc(this._repository) : super(PokemonListInitialState()) {
+    on<PokemonListFetchEvent>(
+      (event, emit) => switch (event) {
+        PokemonListFetchEvent() => _get(event, emit),
+      },
+    );
+  }
 
   final PokemonRepository _repository;
 
-  Future<void> get() async {
-    bool isLoading = switch(state) {
+  Future<void> _get(
+    PokemonListFetchEvent event,
+    Emitter<PokemonListState> emit,
+  ) async {
+    bool isLoading = switch (state) {
       PokemonListInitialState() || PokemonListExceptionState() => false,
       PokemonListLoadingState() => true,
       PokemonListLoadedState state => state.isLoading,
     };
 
-    if(isLoading) return;
+    if (isLoading) return;
 
     if (state case PokemonListLoadedState state) {
       emit(PokemonListLoadedState(pokemons: state.pokemons, isLoading: true));
@@ -26,6 +37,7 @@ class PokemonListCubit extends Cubit<PokemonListState> {
     }
 
     try {
+   
       if (state case PokemonListLoadedState state) {
         final result = await _repository.get(state.pokemons.length);
         emit(
@@ -38,7 +50,10 @@ class PokemonListCubit extends Cubit<PokemonListState> {
         final result = await _repository.get(0);
         emit(PokemonListLoadedState(pokemons: result, isLoading: false));
       }
-    } catch (err) {
+    } catch (err, stackTrace) {
+      print(err);
+      print(stackTrace);
+
       emit(PokemonListExceptionState());
     }
   }

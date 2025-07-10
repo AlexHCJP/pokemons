@@ -26,7 +26,6 @@ class PokemonRepository {
       Uri.parse('https://pokeapi.co/api/v2/pokemon/$id/'),
     );
 
-
     if (response.statusCode == 200) {
       return PokemonEntity.fromJson(
         jsonDecode(response.body) as Map<String, dynamic>,

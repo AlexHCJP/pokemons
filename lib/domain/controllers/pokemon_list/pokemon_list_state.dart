@@ -1,4 +1,4 @@
-part of 'pokemon_list_cubit.dart';
+part of 'pokemon_list_bloc.dart';
 
 @immutable
 sealed class PokemonListState {}
