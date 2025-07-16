@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:laa26/core/di/container.dart';
 import 'package:laa26/core/routing/app_routes.dart';
 import 'package:laa26/data/entity/pokemon_entity.dart';
+import 'package:laa26/data/entity/pokemon_mini_entity.dart';
 import 'package:laa26/domain/controllers/pokemon_list/pokemon_list_bloc.dart';
 
 class PokemonListScreen extends StatefulWidget {
@@ -38,9 +39,18 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
     Navigator.pushNamed(context, AppRoutes.pokemon, arguments: index + 1);
   };
 
+  void _createPokemon() {
+    Navigator.of(context).pushNamed(AppRoutes.pokemonCreate);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Pokemons'),
+        actions: [IconButton(onPressed: _createPokemon, icon: Icon(Icons.add))],
+        leading: Offstage(),
+      ),
       body: BlocBuilder<PokemonListBloc, PokemonListState>(
         builder: (context, state) {
           return switch (state) {

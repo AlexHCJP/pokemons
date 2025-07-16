@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:laa26/data/entity/pokemon_entity.dart';
+import 'package:laa26/data/entity/pokemon_mini_entity.dart';
 import 'package:laa26/data/repositories/pokemon_repository.dart';
 import 'package:meta/meta.dart';
 
