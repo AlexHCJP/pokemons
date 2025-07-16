@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:laa26/core/services/http/http_service.dart';
@@ -9,7 +10,10 @@ import 'package:laa26/domain/params/pokemon_create_params.dart';
 class PokemonRepository {
   final HttpService _httpService;
 
-  PokemonRepository(this._httpService);
+  PokemonRepository(this._httpService) : _streamController = StreamController();
+
+  final StreamController<PokemonEntity> _streamController;
+  Stream<PokemonEntity> get stream => _streamController.stream;
 
   Future<List<PokemonMiniEntity>> get(int offset) async {
     final response = await _httpService.dio.get(
@@ -46,6 +50,6 @@ class PokemonRepository {
       weight: params.width,
       types: [],
     );
-    
+    _streamController.add(pokemon);
   }
 }

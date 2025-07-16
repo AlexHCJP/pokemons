@@ -23,5 +23,8 @@ class PokemonEntity {
           .toList(),
     );
   }
-}
 
+  PokemonMiniEntity toMiniModel() {
+    return PokemonMiniEntity(name: name, url: '1');
+  }
+}

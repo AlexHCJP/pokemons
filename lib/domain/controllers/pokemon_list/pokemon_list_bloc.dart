@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:laa26/data/entity/pokemon_entity.dart';
@@ -8,16 +10,33 @@ import 'package:meta/meta.dart';
 part 'pokemon_list_state.dart';
 part 'pokemon_list_event.dart';
 
-class PokemonListBloc extends Bloc<PokemonListFetchEvent, PokemonListState> {
+class PokemonListBloc extends Bloc<PokemonListEvent, PokemonListState> {
   PokemonListBloc(this._repository) : super(PokemonListInitialState()) {
-    on<PokemonListFetchEvent>(
+    on<PokemonListEvent>(
       (event, emit) => switch (event) {
         PokemonListFetchEvent() => _get(event, emit),
+        _PokemonListCreateEvent() => create(event, emit),
       },
     );
+
+    _streamSubscription = _repository.stream.listen((pokemon) {
+      add(_PokemonListCreateEvent(pokemon: pokemon.toMiniModel()));
+    });
   }
 
   final PokemonRepository _repository;
+  late final StreamSubscription<PokemonEntity> _streamSubscription;
+
+  void create(_PokemonListCreateEvent event, Emitter<PokemonListState> emit) {
+    if (state case PokemonListLoadedState state) {
+      emit(
+        PokemonListLoadedState(
+          pokemons: [event.pokemon, ...state.pokemons],
+          isLoading: false,
+        ),
+      );
+    }
+  }
 
   Future<void> _get(
     PokemonListFetchEvent event,
@@ -38,7 +57,6 @@ class PokemonListBloc extends Bloc<PokemonListFetchEvent, PokemonListState> {
     }
 
     try {
-   
       if (state case PokemonListLoadedState state) {
         final result = await _repository.get(state.pokemons.length);
         emit(
@@ -57,5 +75,11 @@ class PokemonListBloc extends Bloc<PokemonListFetchEvent, PokemonListState> {
 
       emit(PokemonListExceptionState());
     }
+  }
+
+  @override
+  Future<void> close() {
+    _streamSubscription.cancel();
+    return super.close();
   }
 }
