@@ -34,7 +34,7 @@ class PokemonRepository {
   }
 
   Future<PokemonEntity> getById(int id) async {
-    final response = await _httpService.dio.get('/id');
+    final response = await _httpService.dio.get('/$id/');
 
     if (response.statusCode == 200) {
       return PokemonEntity.fromJson(response.data as Map<String, dynamic>);
